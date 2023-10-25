@@ -34,14 +34,7 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
-    private TaskResponse mapToTaskResponse(TaskModel taskModel){
-        return TaskResponse.builder()
-                .id(taskModel.getId())
-                .name(taskModel.getName())
-                .categoryName(taskModel.getCategoryName())
-                .createdAt(taskModel.getCreatedAt())
-                .build();
-    }
+
 
     @Override
     public List<TaskResponse> getAllTask() {
@@ -70,19 +63,35 @@ public class TaskServiceImpl implements TaskService {
 //                .orElseThrow(()-> new NotFoundException("Task not found."));
     }
 
+
+    @Override
+    public TaskResponse updateTask(TaskRequest taskRequest, Long id) {
+        TaskModel taskModel = findTaskById(id);
+        taskModel.setName(taskRequest.getName());
+        taskModel.setCategoryName(taskRequest.getCategoryName());
+        TaskModel savedTaskModel = taskRepository.save(taskModel);
+        return mapToTaskResponse(savedTaskModel);
+    }
+
+    @Override
+    public void deleteTaskId(Long id) {
+        TaskModel taskModel = findTaskById(id);
+        taskRepository.delete(taskModel);
+    }
+
+    private TaskResponse mapToTaskResponse(TaskModel taskModel){
+        return TaskResponse.builder()
+                .id(taskModel.getId())
+                .name(taskModel.getName())
+                .categoryName(taskModel.getCategoryName())
+                .createdAt(taskModel.getCreatedAt())
+                .build();
+    }
+
     private TaskModel findTaskById(Long id){
         return  taskRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Task not found"));
     }
 
-    @Override
-    public TaskResponse updateTask(TaskRequest taskRequest, Long id) {
-        TaskModel taskModel = findTaskById(id);
-        return mapToTaskResponse(taskModel);
-    }
 
-    @Override
-    public void deleteTask() {
-
-    }
 }
